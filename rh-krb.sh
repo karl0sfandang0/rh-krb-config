@@ -3,6 +3,9 @@
 # Not sure if can run this as a script as instructions say paste commands into *same* root terminal
 # https://mojo.redhat.com/docs/DOC-931465
 
+# NOTE: Below last few lines will set up Chrome.  For Firefox open browser -> about.config ->
+# modify "network.negotiate-auth.trusted-uris"  value to "redhat.com"
+
 yum -y install sssd krb5-workstation
 
 Lcorp=ldap.corp.redhat.com
@@ -33,3 +36,11 @@ regionSpecificOptions="--ldapserver=${L1ams},${L2ams},${Lcorp} --krb5kdc=${K1ams
 # regionSpecificOptions="--ldapserver=${L1sin},${L2sin},${Lcorp} --krb5kdc=${K1sin},${K2sin},${K1phx}"
 
 authconfig ${regionSpecificOptions} --enablesssd --enablesssdauth --enableldap --ldapbasedn=dc=redhat,dc=com --enableldaptls --ldaploadcacert=http://password.corp.redhat.com/cacert.crt --enablekrb5 --krb5adminserver=kerberos.corp.redhat.com --krb5realm=REDHAT.COM --enablecachecreds --enablelocauthorize --update
+
+mkdir -p /etc/opt/chrome/policies/managed
+
+cat <<EOF >> /etc/opt/chrome/policies/managed/redhat-corp.json
+{ "AuthServerWhitelist": "*.redhat.com",
+"AuthNegotiateDelegateWhitelist": "*.redhat.com" }
+EOF
+
